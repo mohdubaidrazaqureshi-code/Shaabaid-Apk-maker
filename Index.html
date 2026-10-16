@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHABAID APK Maker</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #eef2f7;
+      color: #172033;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 30px auto;
+      padding: 24px;
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 5px 20px #0001;
+    }
+
+    h1 {
+      text-align: center;
+      color: #155eef;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #667085;
+    }
+
+    label {
+      display: block;
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ccd2dc;
+      border-radius: 9px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      border: none;
+      border-radius: 9px;
+      background: #155eef;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .secondary {
+      background: #172033;
+    }
+
+    #status {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #f2f4f7;
+      overflow-wrap: anywhere;
+    }
+
+    #preview {
+      width: 100%;
+      height: 350px;
+      margin-top: 18px;
+      border: 1px solid #ccd2dc;
+      border-radius: 10px;
+    }
+
+    .note {
+      margin-top: 20px;
+      color: #667085;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <h1>SHABAID APK Maker</h1>
+
+    <p class="subtitle">
+      वेबसाइट से Android ऐप बनाने का शुरुआती टूल
+    </p>
+
+    <label for="website">वेबसाइट का URL</label>
+    <input
+      id="website"
+      type="url"
+      placeholder="https://example.com"
+    >
+
+    <label for="appName">ऐप का नाम</label>
+    <input
+      id="appName"
+      type="text"
+      placeholder="मेरी वेबसाइट"
+      maxlength="50"
+    >
+
+    <label for="appIcon">ऐप का आइकन चुनें</label>
+    <input
+      id="appIcon"
+      type="file"
+      accept="image/png,image/jpeg,image/webp"
+    >
+
+    <button onclick="previewWebsite()">
+      वेबसाइट का प्रीव्यू देखें
+    </button>
+
+    <button class="secondary" onclick="prepareProject()">
+      APK प्रोजेक्ट की जानकारी तैयार करें
+    </button>
+
+    <div id="status" role="status" aria-live="polite">
+      वेबसाइट का URL डालकर शुरुआत करें।
+    </div>
+
+    <iframe
+      id="preview"
+      title="वेबसाइट प्रीव्यू"
+      sandbox="allow-scripts allow-forms allow-same-origin"
+      referrerpolicy="no-referrer"
+    ></iframe>
+
+    <p class="note">
+      ध्यान दें: यह शुरुआती इंटरफेस है। अभी यह वास्तविक APK नहीं बनाता।
+      कुछ वेबसाइटें सुरक्षा कारणों से प्रीव्यू में नहीं खुलेंगी।
+      केवल उन्हीं वेबसाइटों को ऐप में बदलें जिनका उपयोग करने की
+      आपको अनुमति है।
+    </p>
+  </main>
+
+  <script>
+    function getWebsiteURL() {
+      const input = document.getElementById("website").value.trim();
+
+      if (!input) {
+        throw new Error("पहले वेबसाइट का URL डालें।");
+      }
+
+      let url;
+
+      try {
+        url = new URL(input);
+      } catch {
+        throw new Error("कृपया सही वेबसाइट URL डालें।");
+      }
+
+      if (url.protocol !== "https:" && url.protocol !== "http:") {
+        throw new Error("केवल HTTP या HTTPS वेबसाइट स्वीकार हैं।");
+      }
+
+      if (url.username || url.password) {
+        throw new Error("URL में यूजरनेम या पासवर्ड न डालें।");
+      }
+
+      return url.href;
+    }
+
+    function previewWebsite() {
+      const status = document.getElementById("status");
+
+      try {
+        const url = getWebsiteURL();
+
+        document.getElementById("preview").src = url;
+        status.textContent =
+          "प्रीव्यू खोलने की कोशिश की जा रही है। वेबसाइट इसे ब्लॉक भी कर सकती है।";
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    }
+
+    function prepareProject() {
+      const status = document.getElementById("status");
+
+      try {
+        const url = getWebsiteURL();
+        const name = document.getElementById("appName").value.trim();
+
+        if (!name) {
+          throw new Error("पहले ऐप का नाम लिखें।");
+        }
+
+        const icon = document.getElementById("appIcon").files[0];
+
+        if (icon && !["image/png", "image/jpeg", "image/webp"].includes(icon.type)) {
+          throw new Error("PNG, JPG या WEBP आइकन चुनें।");
+        }
+
+        status.textContent =
+          "जानकारी तैयार है। ऐप का नाम: " + name +
+          " | वेबसाइट: " + url +
+          " | आइकन: " + (icon ? icon.name : "अभी नहीं चुना") +
+          " | अगला चरण: Android प्रोजेक्ट और APK बिल्ड सेवा जोड़ना।";
+      } catch (error) {
+        status.textContent = error.message;
+      }
+    }
+  </script>
+</body>
+</html>
